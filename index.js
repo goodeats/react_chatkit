@@ -12,10 +12,10 @@ const DUMMY_DATA = [
 class App extends React.Component {
 
   constructor() {
-    super()
+    super();
     this.state = {
        messages: DUMMY_DATA
-    }
+    };
   }
 
   render() {
@@ -25,7 +25,7 @@ class App extends React.Component {
         <MessageList messages={this.state.messages} />
         <SendMessageForm />
       </div>
-    )
+    );
   }
 }
 
@@ -43,9 +43,9 @@ class MessageList extends React.Component {
                {message.text}
              </div>
            </li>
-         )
+         );
        })}
      </ul>
-    )
+   );
   }
 }
