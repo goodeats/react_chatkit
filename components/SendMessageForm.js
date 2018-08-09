@@ -13,7 +13,7 @@ class SendMessageForm extends React.Component {
   }
 
   handleChange(e){
-    console.log(this.state.message)
+    // console.log(this.state.message)
     this.setState({
       message: e.target.value
     })

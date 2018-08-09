@@ -12,11 +12,14 @@ class App extends React.Component {
   constructor(){
     super()
     this.state = {
+      roomId: null,
       messages: [],
       joinableRooms: [],
       joinedRooms: []
     }
     this.sendMessage = this.sendMessage.bind(this)
+    this.getRooms = this.getRooms.bind(this)
+    this.subscribeToRoom = this.subscribeToRoom.bind(this)
   }
 
   componentDidMount(){
@@ -31,30 +34,46 @@ class App extends React.Component {
     chatManager.connect()
     .then(currentUser => {
       this.currentUser = currentUser
-
-      this.currentUser.getJoinableRooms()
-      .then(joinableRooms => {
-        this.setState({
-          joinableRooms,
-          joinedRooms: this.currentUser.rooms
-        })
-      })
-      .catch(err => console.log('error on joinableRooms: ', err))
-
-      this.currentUser.subscribeToRoom({
-        roomId: 13534962,
-        // messageLimit: 20,
-        hooks: {
-          onNewMessage: message => {
-            this.setState({
-              messages: [...this.state.messages, message]
-            })
-          }
-        }
-      })
+      this.getRooms()
+      this.subscribeToRoom()
     })
     .catch(err => console.log('error on connecting: ', err))
 
+  }
+
+  getRooms(){
+    this.currentUser.getJoinableRooms()
+    .then(joinableRooms => {
+      this.setState({
+        joinableRooms,
+        joinedRooms: this.currentUser.rooms
+      })
+    })
+    .catch(err => console.log('error on joinableRooms: ', err))
+  }
+
+  subscribeToRoom(roomId){
+    // clear room before pasting new messages
+    this.setState({messages: []})
+
+    this.currentUser.subscribeToRoom({
+      roomId: roomId,
+      // messageLimit: 20,
+      hooks: {
+        onNewMessage: message => {
+          this.setState({
+            messages: [...this.state.messages, message]
+          })
+        }
+      }
+    })
+    .then(room => {
+      this.setState({
+        roomId: room.id
+      })
+      this.getRooms()
+    })
+    .catch(err => console.log('error on subscribing to room: ', err))
   }
 
   // inverse data flow
@@ -62,14 +81,16 @@ class App extends React.Component {
     this.currentUser.sendMessage({
       // text: text,
       text,
-      roomId: 13534962
+      roomId: this.state.roomId
     })
   }
 
   render() {
     return (
       <div className="app">
-        <RoomList rooms={[...this.state.joinableRooms, ...this.state.joinedRooms]}/>
+        <RoomList
+          subscribeToRoom={this.subscribeToRoom}
+          rooms={[...this.state.joinableRooms, ...this.state.joinedRooms]}/>
         <MessageList messages={this.state.messages} />
         <NewRoomForm />
         <SendMessageForm sendMessage={this.sendMessage} />
