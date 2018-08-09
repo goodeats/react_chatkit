@@ -14,6 +14,7 @@ class App extends React.Component {
     this.state = {
       messages: []
     }
+    this.sendMessage = this.sendMessage.bind(this)
   }
 
   componentDidMount(){
@@ -27,7 +28,8 @@ class App extends React.Component {
 
     chatManager.connect()
     .then(currentUser => {
-      currentUser.subscribeToRoom({
+      this.currentUser = currentUser
+      this.currentUser.subscribeToRoom({
         roomId: 13534962,
         // messageLimit: 20,
         hooks: {
@@ -41,13 +43,22 @@ class App extends React.Component {
     })
   }
 
+  // inverse data flow
+  sendMessage(text){
+    this.currentUser.sendMessage({
+      // text: text,
+      text,
+      roomId: 13534962
+    })
+  }
+
   render() {
     return (
       <div className="app">
         <RoomList />
         <MessageList messages={this.state.messages} />
         <NewRoomForm />
-        <SendMessageForm />
+        <SendMessageForm sendMessage={this.sendMessage} />
       </div>
     );
   }
