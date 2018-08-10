@@ -99,6 +99,7 @@ html, body {
 }
 
 .new-room-form input {
+    line-height: 60px; // fixing bug
     width: 135px;
     background: var(--secondary-color);
 }
