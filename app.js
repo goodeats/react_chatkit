@@ -65,6 +65,9 @@ class App extends React.Component {
           this.setState({
             messages: [...this.state.messages, message]
           })
+        },
+        onUserStartedTyping: user => {
+          // todo
         }
       }
     })
